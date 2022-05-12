@@ -27,6 +27,7 @@ export const GoodsList: FC<Props> = (props) => {
             className={good.isActive ? 'active' : ''}
             style={{ marginBottom: '15px' }}
           >
+            <span>{good.id}</span>
             <input
               type="text"
               value={good.name}
