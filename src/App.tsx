@@ -1,107 +1,41 @@
-import { ChangeEvent, Component } from 'react';
+import {
+  ChangeEvent, FC, useEffect, useMemo, useState,
+} from 'react';
 import './App.scss';
 import { GoodsList } from './components/GoodsList';
+import { ActiveFilter, goodsFromServer, SortBy } from './constants';
 import { Good } from './typedefs';
+import { filterGoods, sortGoods } from './utils';
 
-enum ActiveFilter {
-  All = 'all',
-  Active = 'active',
-  NotActive = 'notActive',
-}
+export const App: FC = () => {
+  const [goods, setGoods] = useState<Good[]>(goodsFromServer);
+  const [nameFilter, setNameFilter] = useState('');
+  const [count, setCount] = useState(0);
+  const [activeFilter, setActiveFilter] = useState(ActiveFilter.All);
+  const [sortBy, setSortBy] = useState(SortBy.Initial);
+  const [isReversed, setIsReversed] = useState(false);
 
-enum SortBy {
-  Name = 'name',
-  Id = 'id',
-  Initial = 'initial',
-}
+  const goodsToRender = useMemo(() => {
+    const filteredGoods = filterGoods(goods, nameFilter, activeFilter);
+    const sortedGoods = sortGoods(filteredGoods, sortBy);
 
-interface State {
-  goods: Good[];
-  nameFilter: string;
-  activeFilter: ActiveFilter;
-  count: number;
-  sortBy: SortBy;
-  isReversed: boolean;
-}
+    return isReversed
+      ? sortedGoods.reverse()
+      : sortedGoods;
+  }, [nameFilter, activeFilter, sortBy, isReversed, goods]);
 
-const goodsFromServer = [
-  { id: 3, name: 'garlic', isActive: false },
-  { id: 1, name: 'onion', isActive: false },
-  { id: 2, name: 'tomato', isActive: false },
-];
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    const intervalId = setInterval(() => console.log(new Date()), 1000);
 
-function filter(
-  goods: Good[],
-  nameFilter: string,
-  activeFilter: ActiveFilter,
-): Good[] {
-  return goods
-    .filter((currentGood) => (
-      !currentGood.name || currentGood.name.includes(nameFilter)
-    ))
-    .filter((currentGood) => {
-      switch (activeFilter) {
-        case ActiveFilter.All: {
-          return true;
-        }
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
 
-        case ActiveFilter.Active: {
-          return currentGood.isActive;
-        }
-
-        case ActiveFilter.NotActive: {
-          return !currentGood.isActive;
-        }
-
-        default: {
-          return true;
-        }
-      }
-    });
-}
-
-function sortByName(goods: Good[]): Good[] {
-  return [...goods].sort((goodA, goodB) => (
-    goodA.name.localeCompare(goodB.name)
-  ));
-}
-
-function sortById(goods: Good[]): Good[] {
-  return [...goods].sort((goodA, goodB) => (
-    goodA.id - goodB.id
-  ));
-}
-
-function sort(goods: Good[], sortBy: SortBy): Good[] {
-  switch (sortBy) {
-    case SortBy.Name: {
-      return sortByName(goods);
-    }
-
-    case SortBy.Id: {
-      return sortById(goods);
-    }
-
-    case SortBy.Initial:
-    default: {
-      return goods;
-    }
-  }
-}
-
-export class App extends Component<{}, State> {
-  state: State = {
-    goods: goodsFromServer,
-    nameFilter: '',
-    count: 0,
-    activeFilter: ActiveFilter.All,
-    sortBy: SortBy.Initial,
-    isReversed: false,
-  };
-
-  toggleGood = (id: number): void => {
-    this.setState(({ goods }) => ({
-      goods: goods.map(currentGood => {
+  const toggleGood = (id: number): void => {
+    setGoods((currentGoods) => (
+      currentGoods.map(currentGood => {
         if (currentGood.id === id) {
           return {
             ...currentGood,
@@ -110,13 +44,13 @@ export class App extends Component<{}, State> {
         }
 
         return currentGood;
-      }),
-    }));
+      })
+    ));
   };
 
-  renameGood = (id: number, updatedName: string): void => {
-    this.setState(({ goods }) => ({
-      goods: goods.map(currentGood => {
+  const renameGood = (id: number, updatedName: string): void => {
+    setGoods((currentGoods) => (
+      currentGoods.map(currentGood => {
         if (currentGood.id === id) {
           return {
             ...currentGood,
@@ -125,159 +59,132 @@ export class App extends Component<{}, State> {
         }
 
         return currentGood;
-      }),
-    }));
+      })
+    ));
   };
 
-  addEmptyGood = () => {
-    this.setState(({ goods }) => ({
-      goods: [
-        ...goods,
+  const addEmptyGood = () => {
+    setGoods((currentGoods) => (
+      [
+        ...currentGoods,
         {
-          id: goods[goods.length - 1].id + 1,
+          id: currentGoods[currentGoods.length - 1].id + 1,
           isActive: false,
           name: '',
         },
-      ],
-    }));
+      ]
+    ));
   };
 
-  removeGood = (id: number) => {
-    this.setState(({ goods }) => ({
-      goods: goods.filter(currentGood => (
+  const removeGood = (id: number) => {
+    setGoods((currentGoods) => (
+      currentGoods.filter(currentGood => (
         currentGood.id !== id
-      )),
-    }));
+      ))
+    ));
   };
 
-  setNameFilter = (event: ChangeEvent<HTMLInputElement>) => {
-    this.setState({
-      nameFilter: event.target.value,
-    });
+  const handleNameFilterChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setNameFilter(event.target.value);
   };
 
-  setActiveFilter = (event: ChangeEvent<HTMLSelectElement>) => {
-    this.setState({
-      activeFilter: event.target.value as ActiveFilter,
-    });
+  const changeActiveFilter = (event: ChangeEvent<HTMLSelectElement>) => {
+    setActiveFilter(event.target.value as ActiveFilter);
   };
 
-  setSortBy = (event: ChangeEvent<HTMLSelectElement>) => {
-    this.setState({
-      sortBy: event.target.value as SortBy,
-      isReversed: false,
-    });
+  const handleSortByChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSortBy(event.target.value as SortBy);
+    setIsReversed(false);
   };
 
-  toggleReverse = () => {
-    this.setState((prev) => ({
-      isReversed: !prev.isReversed,
-    }));
+  const toggleReverse = () => {
+    setIsReversed((prev) => !prev);
   };
 
-  render() {
-    const {
-      goods,
-      nameFilter,
-      activeFilter,
-      count,
-      sortBy,
-      isReversed,
-    } = this.state;
-
-    const filteredGoods = filter(goods, nameFilter, activeFilter);
-    const sortedGoods = sort(filteredGoods, sortBy);
-    const goodsToRender = isReversed
-      ? sortedGoods.reverse()
-      : sortedGoods;
-
-    return (
-      <>
-        <div>
-          <label style={{ display: 'block' }}>
-            <p>Search by name:</p>
-            <input
-              type="text"
-              onChange={this.setNameFilter}
-            />
-          </label>
-          <label style={{ marginTop: '10px', display: 'block' }}>
-            Filter:
-            <select
-              name="activeFilter"
-              value={activeFilter}
-              onChange={this.setActiveFilter}
-            >
-              <option
-                value={ActiveFilter.Active}
-              >
-                Active
-              </option>
-              <option
-                value={ActiveFilter.NotActive}
-              >
-                Not active
-              </option>
-              <option
-                value={ActiveFilter.All}
-              >
-                All
-              </option>
-            </select>
-          </label>
-          <label style={{ marginTop: '10px', display: 'block' }}>
-            Sort:
-            <select
-              name="sortBy"
-              value={sortBy}
-              onChange={this.setSortBy}
-            >
-              <option
-                value={SortBy.Name}
-              >
-                Name
-              </option>
-              <option
-                value={SortBy.Id}
-              >
-                Id
-              </option>
-              <option
-                value={SortBy.Initial}
-              >
-                Initial
-              </option>
-            </select>
-          </label>
-
-          <button
-            type="button"
-            onClick={this.toggleReverse}
+  return (
+    <>
+      <div>
+        <label style={{ display: 'block' }}>
+          <p>Search by name:</p>
+          <input
+            type="text"
+            onChange={handleNameFilterChange}
+          />
+        </label>
+        <label style={{ marginTop: '10px', display: 'block' }}>
+          Filter:
+          <select
+            name="activeFilter"
+            value={activeFilter}
+            onChange={changeActiveFilter}
           >
-            {isReversed ? 'Un-reverse' : 'Reverse'}
-          </button>
-        </div>
-
-        <div>
-          <h2>{count}</h2>
-          <button
-            type="button"
-            onClick={() => this.setState((prev) => ({
-              count: prev.count + 1,
-            }))}
+            <option
+              value={ActiveFilter.Active}
+            >
+              Active
+            </option>
+            <option
+              value={ActiveFilter.NotActive}
+            >
+              Not active
+            </option>
+            <option
+              value={ActiveFilter.All}
+            >
+              All
+            </option>
+          </select>
+        </label>
+        <label style={{ marginTop: '10px', display: 'block' }}>
+          Sort:
+          <select
+            name="sortBy"
+            value={sortBy}
+            onChange={handleSortByChange}
           >
-            ➕
-          </button>
-        </div>
+            <option
+              value={SortBy.Name}
+            >
+              Name
+            </option>
+            <option
+              value={SortBy.Id}
+            >
+              Id
+            </option>
+            <option
+              value={SortBy.Initial}
+            >
+              Initial
+            </option>
+          </select>
+        </label>
 
-        <GoodsList
-          goods={goodsToRender}
-          onAdd={this.addEmptyGood}
-          onRemove={this.removeGood}
-          onRename={this.renameGood}
-          onToggle={this.toggleGood}
-        />
-      </>
-    );
-  }
-}
+        <button
+          type="button"
+          onClick={toggleReverse}
+        >
+          {isReversed ? 'Un-reverse' : 'Reverse'}
+        </button>
+      </div>
+
+      <div>
+        <h2>{count}</h2>
+        <button
+          type="button"
+          onClick={() => setCount((prev) => prev + 1)}
+        >
+          ➕
+        </button>
+      </div>
+
+      <GoodsList
+        goods={goodsToRender}
+        onAdd={addEmptyGood}
+        onRemove={removeGood}
+        onRename={renameGood}
+        onToggle={toggleGood}
+      />
+    </>
+  );
+};
