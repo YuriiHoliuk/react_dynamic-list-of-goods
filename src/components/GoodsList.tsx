@@ -36,13 +36,15 @@ export const GoodsList: FC<Props> = (props) => {
               )}
             />
 
-            <button
-              type="button"
-              onClick={() => onToggle(good.id)}
-              style={{ marginLeft: '10px' }}
-            >
+            <label>
+              <input
+                type="checkbox"
+                checked={good.isActive}
+                onChange={() => onToggle(good.id)}
+                style={{ marginLeft: '10px' }}
+              />
               Toggle
-            </button>
+            </label>
 
             <button
               type="button"

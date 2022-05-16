@@ -103,14 +103,45 @@ export const App: FC = () => {
 
   return (
     <>
-      <div>
+      <form
+        method="POST"
+        name="goodsFilters"
+        onSubmit={(event) => {
+          event.preventDefault();
+
+          const formValue = {
+            nameFilter,
+            activeFilter,
+            sortBy,
+          };
+
+          // eslint-disable-next-line no-console
+          console.log(formValue);
+        }}
+      >
         <label style={{ display: 'block' }}>
           <p>Search by name:</p>
           <input
             type="text"
+            value={nameFilter}
             onChange={handleNameFilterChange}
+            name="nameFilter"
           />
         </label>
+        <div>
+          <button
+            onClick={() => setNameFilter('')}
+            type="button"
+          >
+            Clear name filter
+          </button>
+          <button
+            onClick={() => setNameFilter('garlic')}
+            type="button"
+          >
+            Find garlic
+          </button>
+        </div>
         <label style={{ marginTop: '10px', display: 'block' }}>
           Filter:
           <select
@@ -166,7 +197,13 @@ export const App: FC = () => {
         >
           {isReversed ? 'Un-reverse' : 'Reverse'}
         </button>
-      </div>
+
+        <div>
+          <button type="submit">
+            Submit
+          </button>
+        </div>
+      </form>
 
       <div>
         <h2>{count}</h2>
