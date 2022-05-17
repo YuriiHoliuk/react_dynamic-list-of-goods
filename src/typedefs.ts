@@ -3,3 +3,5 @@ export interface Good {
   name: string;
   isActive: boolean;
 }
+
+export type NewGood = Omit<Good, 'id'>;
