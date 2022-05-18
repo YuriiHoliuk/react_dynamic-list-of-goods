@@ -199,7 +199,6 @@ export class App extends Component<{}, State> {
 
         <GoodsList
           goods={goodsToRender}
-          onAdd={this.addEmptyGood}
           onRemove={this.removeGood}
           onRename={this.renameGood}
           onToggle={this.toggleGood}
