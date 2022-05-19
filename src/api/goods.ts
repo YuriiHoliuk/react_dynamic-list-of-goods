@@ -7,7 +7,7 @@ export async function getAll(): Promise<Good[]> {
   return response.json();
 }
 
-export const get5First = async (): Promise<Good[]> => {
+export const getFiveFirst = async (): Promise<Good[]> => {
   const response = await fetch(API_URL);
   const data = await response.json();
 

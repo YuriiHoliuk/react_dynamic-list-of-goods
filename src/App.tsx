@@ -21,7 +21,7 @@ const App: FC = () => {
       <button
         type="button"
         onClick={async () => {
-          setGoods(await goodsAPI.get5First());
+          setGoods(await goodsAPI.getFiveFirst());
         }}
         className="App__button"
       >

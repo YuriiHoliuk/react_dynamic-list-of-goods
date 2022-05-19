@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { Good } from '../typedefs';
 import './GoodsList.scss';
 
 interface Props {
