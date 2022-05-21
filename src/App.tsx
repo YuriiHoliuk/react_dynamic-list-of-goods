@@ -1,79 +1,57 @@
-import {
-  FC, useState,
-} from 'react';
+import React, { useState } from 'react';
 import './App.scss';
-import { Goods } from './components/Goods';
-import { NewGoodForm } from './components/NewGoodForm';
-import { goodsFromServer } from './constants';
-import { Good, NewGood } from './typedefs';
+import { GoodsList } from './Components/GoodsList/GoodsList';
 
-let lastId = 3;
+import { getAll, get5First, getRedGoods } from './api/goods';
 
-export const App: FC = () => {
-  const [goods, setGoods] = useState<Good[]>(goodsFromServer);
+const App: React.FC = () => {
+  const [localGoods, setLocalGoods] = useState<Good[]>([]);
 
-  const toggleGood = (id: number): void => {
-    setGoods((currentGoods) => (
-      currentGoods.map(currentGood => {
-        if (currentGood.id === id) {
-          return {
-            ...currentGood,
-            isActive: !currentGood.isActive,
-          };
-        }
+  const getAllGoods = async () => {
+    const allGoodsFromServer = await getAll();
 
-        return currentGood;
-      })
-    ));
+    setLocalGoods(allGoodsFromServer);
   };
 
-  const renameGood = (id: number, updatedName: string): void => {
-    setGoods((currentGoods) => (
-      currentGoods.map(currentGood => {
-        if (currentGood.id === id) {
-          return {
-            ...currentGood,
-            name: updatedName,
-          };
-        }
+  const getFirst5 = async () => {
+    const first5 = await get5First();
 
-        return currentGood;
-      })
-    ));
+    setLocalGoods(first5);
   };
 
-  const addGood = (newGood: NewGood) => {
-    setGoods((currentGoods) => (
-      [
-        ...currentGoods,
-        {
-          ...newGood,
-          id: ++lastId,
-        },
-      ]
-    ));
-  };
+  const getRed = async () => {
+    const redGoods = await getRedGoods();
 
-  const removeGood = (id: number) => {
-    setGoods((currentGoods) => (
-      currentGoods.filter(currentGood => (
-        currentGood.id !== id
-      ))
-    ));
+    setLocalGoods(redGoods);
   };
 
   return (
-    <>
-      <NewGoodForm
-        onAdd={addGood}
-      />
+    <div className="api">
+      <h1>Dynamic list of Goods</h1>
+      <button
+        type="button"
+        className="button"
+        onClick={getAllGoods}
+      >
+        Load all goods
+      </button>
 
-      <Goods
-        goods={goods}
-        onRemove={removeGood}
-        onRename={renameGood}
-        onToggle={toggleGood}
-      />
-    </>
+      <button
+        type="button"
+        className="button"
+        onClick={getFirst5}
+      >
+        Load first 5 goods
+      </button>
+
+      <button
+        type="button"
+        className="button"
+        onClick={getRed}
+      >
+        Load red goods
+      </button>
+      <GoodsList goods={localGoods} />
+    </div>
   );
 };
