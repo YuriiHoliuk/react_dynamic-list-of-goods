@@ -1,79 +1,29 @@
 import {
-  FC, useState,
+  FC,
 } from 'react';
 import './App.scss';
 import { Goods } from './components/Goods';
 import { NewGoodForm } from './components/NewGoodForm';
-import { goodsFromServer } from './constants';
-import { Good, NewGood } from './typedefs';
-
-let lastId = 3;
+import { GoodsContextProvider } from './GoodsContext';
+import { useGoods } from './hooks/useGoods';
 
 export const App: FC = () => {
-  const [goods, setGoods] = useState<Good[]>(goodsFromServer);
-
-  const toggleGood = (id: number): void => {
-    setGoods((currentGoods) => (
-      currentGoods.map(currentGood => {
-        if (currentGood.id === id) {
-          return {
-            ...currentGood,
-            isActive: !currentGood.isActive,
-          };
-        }
-
-        return currentGood;
-      })
-    ));
-  };
-
-  const renameGood = (id: number, updatedName: string): void => {
-    setGoods((currentGoods) => (
-      currentGoods.map(currentGood => {
-        if (currentGood.id === id) {
-          return {
-            ...currentGood,
-            name: updatedName,
-          };
-        }
-
-        return currentGood;
-      })
-    ));
-  };
-
-  const addGood = (newGood: NewGood) => {
-    setGoods((currentGoods) => (
-      [
-        ...currentGoods,
-        {
-          ...newGood,
-          id: ++lastId,
-        },
-      ]
-    ));
-  };
-
-  const removeGood = (id: number) => {
-    setGoods((currentGoods) => (
-      currentGoods.filter(currentGood => (
-        currentGood.id !== id
-      ))
-    ));
-  };
+  const [
+    goods,
+    callbacks,
+  ] = useGoods();
 
   return (
     <>
-      <NewGoodForm
-        onAdd={addGood}
-      />
+      <GoodsContextProvider
+        {...callbacks}
+      >
+        <NewGoodForm />
 
-      <Goods
-        goods={goods}
-        onRemove={removeGood}
-        onRename={renameGood}
-        onToggle={toggleGood}
-      />
+        <Goods
+          goods={goods}
+        />
+      </GoodsContextProvider>
     </>
   );
 };

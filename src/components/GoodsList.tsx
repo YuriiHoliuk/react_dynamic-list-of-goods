@@ -1,22 +1,19 @@
 import {
   FC,
 } from 'react';
+import { useGoodsContext } from '../GoodsContext';
 import { Good } from '../typedefs';
 
 interface Props {
   goods: Good[];
-  onToggle: (id: number) => void;
-  onRename: (id: number, name: string) => void;
-  onRemove: (id: number) => void;
 }
 
 export const GoodsList: FC<Props> = (props) => {
   const {
     goods,
-    onToggle,
-    onRename,
-    onRemove,
   } = props;
+
+  const goodsContext = useGoodsContext();
 
   return (
     <ul>
@@ -31,7 +28,7 @@ export const GoodsList: FC<Props> = (props) => {
             type="text"
             value={good.name}
             onChange={(event) => (
-              onRename(good.id, event.target.value)
+              goodsContext.renameGood(good.id, event.target.value)
             )}
           />
 
@@ -39,7 +36,7 @@ export const GoodsList: FC<Props> = (props) => {
             <input
               type="checkbox"
               checked={good.isActive}
-              onChange={() => onToggle(good.id)}
+              onChange={() => goodsContext.toggleGood(good.id)}
               style={{ marginLeft: '10px' }}
             />
             Toggle
@@ -47,7 +44,7 @@ export const GoodsList: FC<Props> = (props) => {
 
           <button
             type="button"
-            onClick={() => onRemove(good.id)}
+            onClick={() => goodsContext.removeGood(good.id)}
             style={{ marginLeft: '10px' }}
           >
             🗑

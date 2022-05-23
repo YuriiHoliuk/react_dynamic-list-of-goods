@@ -1,5 +1,5 @@
 import {
-  FC, useMemo, useState,
+  FC, memo, useCallback, useMemo, useState,
 } from 'react';
 import { GoodControls } from './GoodsControls';
 import { GoodsList } from './GoodsList';
@@ -9,17 +9,11 @@ import { filterGoods, sortGoods } from '../utils';
 
 interface Props {
   goods: Good[];
-  onToggle: (id: number) => void;
-  onRename: (id: number, name: string) => void;
-  onRemove: (id: number) => void;
 }
 
-export const Goods: FC<Props> = (props) => {
+export const Goods: FC<Props> = memo((props) => {
   const {
     goods,
-    onToggle,
-    onRename,
-    onRemove,
   } = props;
 
   const [nameFilter, setNameFilter] = useState('');
@@ -36,14 +30,14 @@ export const Goods: FC<Props> = (props) => {
       : sortedGoods;
   }, [nameFilter, activeFilter, sortBy, isReversed, goods]);
 
-  const handleSortByChange = (value: SortBy) => {
+  const handleSortByChange = useCallback((value: SortBy) => {
     setSortBy(value as SortBy);
     setIsReversed(false);
-  };
+  }, []);
 
-  const toggleReverse = () => {
+  const toggleReverse = useCallback(() => {
     setIsReversed((prev) => !prev);
-  };
+  }, []);
 
   return (
     <>
@@ -60,10 +54,7 @@ export const Goods: FC<Props> = (props) => {
 
       <GoodsList
         goods={goodsToRender}
-        onRemove={onRemove}
-        onRename={onRename}
-        onToggle={onToggle}
       />
     </>
   );
-};
+});

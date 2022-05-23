@@ -1,11 +1,8 @@
 import {
   FC, useCallback, useState, ChangeEvent, FocusEvent, useMemo,
 } from 'react';
+import { useGoodsContext } from '../GoodsContext';
 import { NewGood } from '../typedefs';
-
-interface Props {
-  onAdd: (newGood: NewGood) => void;
-}
 
 type NewGoodErrors = {
   [key in keyof NewGood]: null | string;
@@ -21,14 +18,12 @@ const initialGoodErrors: NewGoodErrors = {
   isActive: null,
 };
 
-export const NewGoodForm: FC<Props> = (props) => {
-  const {
-    onAdd,
-  } = props;
+export const NewGoodForm: FC = () => {
   const [newGood, setNewGood] = useState<NewGood>(initialGood);
   const [newGoodErrors, setNewGoodErrors] = useState<NewGoodErrors>(
     initialGoodErrors,
   );
+  const { addGood } = useGoodsContext();
 
   const formIsValid = useMemo(() => {
     return Object.values(newGoodErrors)
@@ -86,7 +81,7 @@ export const NewGoodForm: FC<Props> = (props) => {
           return;
         }
 
-        onAdd(newGood);
+        addGood(newGood);
         setNewGood(initialGood);
       }}
     >
