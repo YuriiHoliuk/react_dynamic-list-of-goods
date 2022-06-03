@@ -72,6 +72,7 @@ export const NewGoodForm: FC = () => {
 
   return (
     <form
+      style={{ gridColumn: 2 }}
       method="POST"
       name="good"
       onSubmit={(event) => {

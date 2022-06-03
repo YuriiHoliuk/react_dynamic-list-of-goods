@@ -37,7 +37,7 @@ export const GoodControls: FC<Props> = (props) => {
   };
 
   return (
-    <div>
+    <div style={{ gridColumn: 2 }}>
       <label style={{ display: 'block' }}>
         <p>Search by name:</p>
         <input

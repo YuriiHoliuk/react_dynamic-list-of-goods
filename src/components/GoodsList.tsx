@@ -15,8 +15,22 @@ export const GoodsList: FC<Props> = (props) => {
 
   const goodsContext = useGoodsContext();
 
+  if (goodsContext.isLoading) {
+    return (
+      <h1 style={{ margin: '0 auto' }}>Loading...</h1>
+    );
+  }
+
+  if (goodsContext.error) {
+    return (
+      <h1 style={{ margin: '0 auto', color: 'tomato' }}>
+        {goodsContext.error}
+      </h1>
+    );
+  }
+
   return (
-    <ul>
+    <ul style={{ order: -1 }}>
       {goods.map((good) => (
         <li
           key={good.id}

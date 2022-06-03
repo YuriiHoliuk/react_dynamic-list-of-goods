@@ -10,13 +10,13 @@ import { useGoods } from './hooks/useGoods';
 export const App: FC = () => {
   const [
     goods,
-    callbacks,
+    goodsMeta,
   ] = useGoods();
 
   return (
-    <>
+    <div className="root">
       <GoodsContextProvider
-        {...callbacks}
+        {...goodsMeta}
       >
         <NewGoodForm />
 
@@ -24,6 +24,6 @@ export const App: FC = () => {
           goods={goods}
         />
       </GoodsContextProvider>
-    </>
+    </div>
   );
 };

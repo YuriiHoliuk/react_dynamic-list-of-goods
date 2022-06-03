@@ -11,6 +11,8 @@ export interface GoodsContextType {
   toggleGood: (id: number) => void;
   renameGood: (id: number, name: string) => void;
   removeGood: (id: number) => void;
+  isLoading: boolean;
+  error: string | null,
 }
 
 const GoodsContext = createContext<GoodsContextType>({
@@ -18,6 +20,8 @@ const GoodsContext = createContext<GoodsContextType>({
   toggleGood() {},
   renameGood() {},
   removeGood() {},
+  isLoading: false,
+  error: null,
 });
 
 export const GoodsContextProvider: FC<GoodsContextType> = (

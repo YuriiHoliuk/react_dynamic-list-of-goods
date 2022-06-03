@@ -4,4 +4,10 @@ export interface Good {
   isActive: boolean;
 }
 
+export interface GoodFromServer {
+  id: number;
+  name: string;
+  color: string;
+}
+
 export type NewGood = Omit<Good, 'id'>;
